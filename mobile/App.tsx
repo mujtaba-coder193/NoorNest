@@ -6,6 +6,7 @@ import { DAILY_DUAS, QURAN_SURAHS, QURAN_TRANSLATION_SOURCE } from './deenConten
 import CountriesScreen from './CountriesScreen';
 import FoodGalleryScreen from './FoodGalleryScreen';
 import SymbolGalleryScreen from './SymbolGalleryScreen';
+import NumbersScreen from './NumbersScreen';
 import {
   Pressable,
   Linking,
@@ -80,13 +81,13 @@ type LearningModule = {
   description: string;
   icon: string;
   tint: string;
-  route?: 'alphabet' | 'countries' | 'daily-duas' | 'food' | 'quran' | 'symbols';
+  route?: 'alphabet' | 'countries' | 'daily-duas' | 'food' | 'numbers' | 'quran' | 'symbols';
 };
 
 const DUNYA_MODULES: LearningModule[] = [
   { title: 'Letters', description: 'English A to Z', icon: 'Aa', tint: '#FCE1D8', route: 'alphabet' },
   { title: 'Countries', description: 'Flags, capitals and quick facts', icon: '🌍', tint: '#DCEAF3', route: 'countries' },
-  { title: 'Numbers', description: 'Count and discover', icon: '123', tint: '#FCECC3' },
+  { title: 'Numbers', description: 'Count from 1 to 20', icon: '123', tint: '#FCECC3', route: 'numbers' },
   { title: 'Nature', description: 'Animals, birds, fish & flowers', icon: '🌿', tint: '#DCEFE5', route: 'symbols' },
   { title: 'Fruits & vegetables', description: 'Pictures, names & food facts', icon: '🍓', tint: '#FCE1D8', route: 'food' },
 ];
@@ -97,7 +98,7 @@ const DEEN_MODULES: LearningModule[] = [
 ];
 
 export default function App() {
-  const [screen, setScreen] = useState<'home' | 'alphabet' | 'countries' | 'daily-duas' | 'food' | 'quran' | 'symbols'>('home');
+  const [screen, setScreen] = useState<'home' | 'alphabet' | 'countries' | 'daily-duas' | 'food' | 'numbers' | 'quran' | 'symbols'>('home');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedDuaIndex, setSelectedDuaIndex] = useState(0);
   const [selectedSurahIndex, setSelectedSurahIndex] = useState(0);
@@ -580,6 +581,13 @@ export default function App() {
           <CountriesScreen onBack={() => setScreen('home')} />
         ) : screen === 'symbols' ? (
           <SymbolGalleryScreen onBack={() => setScreen('home')} />
+        ) : screen === 'numbers' ? (
+          <NumbersScreen
+            onBack={() => {
+              Speech.stop();
+              setScreen('home');
+            }}
+          />
         ) : (
           <FoodGalleryScreen onBack={() => setScreen('home')} />
         )}

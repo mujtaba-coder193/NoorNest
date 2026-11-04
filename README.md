@@ -84,7 +84,7 @@ page. Verify each image's relevance and usage terms before public release.
 	prompt appears and press Enter:
 
 	```bash
-	read -s -p "Paste your Expo access token (hidden): " EXPO_TOKEN
+	read -s "EXPO_TOKEN?Paste your Expo access token (hidden): "
 	```
 
 6. In the same terminal, export the token and verify the account:
