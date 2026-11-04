@@ -4,6 +4,8 @@ import * as Speech from 'expo-speech';
 import { type ComponentRef, useEffect, useRef, useState } from 'react';
 import { DAILY_DUAS, QURAN_SURAHS, QURAN_TRANSLATION_SOURCE } from './deenContent';
 import CountriesScreen from './CountriesScreen';
+import FoodGalleryScreen from './FoodGalleryScreen';
+import SymbolGalleryScreen from './SymbolGalleryScreen';
 import {
   Pressable,
   Linking,
@@ -78,15 +80,15 @@ type LearningModule = {
   description: string;
   icon: string;
   tint: string;
-  route?: 'alphabet' | 'countries' | 'daily-duas' | 'quran';
+  route?: 'alphabet' | 'countries' | 'daily-duas' | 'food' | 'quran' | 'symbols';
 };
 
 const DUNYA_MODULES: LearningModule[] = [
   { title: 'Letters', description: 'English A to Z', icon: 'Aa', tint: '#FCE1D8', route: 'alphabet' },
   { title: 'Countries', description: 'Flags, capitals and quick facts', icon: '🌍', tint: '#DCEAF3', route: 'countries' },
   { title: 'Numbers', description: 'Count and discover', icon: '123', tint: '#FCECC3' },
-  { title: 'Animals & fruits', description: 'Meet the living world', icon: '🐘', tint: '#DCEFE5' },
-  { title: 'Vegetables', description: 'Explore plants and colors', icon: '🥕', tint: '#FCE1D8' },
+  { title: 'Nature', description: 'Animals, birds, fish & flowers', icon: '🌿', tint: '#DCEFE5', route: 'symbols' },
+  { title: 'Fruits & vegetables', description: 'Pictures, names & food facts', icon: '🍓', tint: '#FCE1D8', route: 'food' },
 ];
 
 const DEEN_MODULES: LearningModule[] = [
@@ -95,7 +97,7 @@ const DEEN_MODULES: LearningModule[] = [
 ];
 
 export default function App() {
-  const [screen, setScreen] = useState<'home' | 'alphabet' | 'countries' | 'daily-duas' | 'quran'>('home');
+  const [screen, setScreen] = useState<'home' | 'alphabet' | 'countries' | 'daily-duas' | 'food' | 'quran' | 'symbols'>('home');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedDuaIndex, setSelectedDuaIndex] = useState(0);
   const [selectedSurahIndex, setSelectedSurahIndex] = useState(0);
@@ -574,8 +576,12 @@ export default function App() {
               </Text>
             </View>
           </ScrollView>
-        ) : (
+        ) : screen === 'countries' ? (
           <CountriesScreen onBack={() => setScreen('home')} />
+        ) : screen === 'symbols' ? (
+          <SymbolGalleryScreen onBack={() => setScreen('home')} />
+        ) : (
+          <FoodGalleryScreen onBack={() => setScreen('home')} />
         )}
       </SafeAreaView>
     </SafeAreaProvider>

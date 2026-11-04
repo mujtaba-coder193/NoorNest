@@ -9,7 +9,6 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { COUNTRY_SYMBOLS_BY_CODE, COUNTRY_SYMBOLS_NOTICE } from './countrySymbols';
 import { COUNTRIES, COUNTRY_DATA_ATTRIBUTION, type CountryProfile } from './countries';
 
 type CountriesScreenProps = {
@@ -67,7 +66,6 @@ export default function CountriesScreen({ onBack }: CountriesScreenProps) {
 
   if (selectedCountry) {
     const capital = selectedCountry.capitals.join(', ') || 'No capital listed';
-    const symbols = COUNTRY_SYMBOLS_BY_CODE[selectedCountry.code];
     return (
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={[styles.content, isWide && styles.contentWide]}>
@@ -96,20 +94,6 @@ export default function CountriesScreen({ onBack }: CountriesScreenProps) {
             {renderFact('Currency', selectedCountry.currencies.join(', '))}
           </View>
 
-          <Text style={[styles.sectionTitle, styles.symbolSectionTitle]}>National symbols & sport</Text>
-          <View style={styles.factsGrid}>
-            {renderFact('National animal', symbols.animal ?? 'Not listed')}
-            {renderFact('National bird', symbols.bird ?? 'Not listed')}
-            {renderFact('National flower', symbols.flower ?? 'Not listed')}
-            {renderFact('National sport', symbols.sport ?? 'Not listed')}
-          </View>
-
-          <View style={styles.symbolsNote}>
-            <Text style={styles.symbolsTitle}>About these facts</Text>
-            <Text style={styles.symbolsDescription}>
-              {COUNTRY_SYMBOLS_NOTICE} Images will be added in a later story.
-            </Text>
-          </View>
           <Text style={styles.dataAttribution}>{COUNTRY_DATA_ATTRIBUTION}</Text>
         </View>
       </ScrollView>
