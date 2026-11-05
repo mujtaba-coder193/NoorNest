@@ -107,3 +107,125 @@ export const QURAN_SURAHS = [
 ] as const;
 
 export const QURAN_TRANSLATION_SOURCE = 'M. Pickthall (1930), via Quran.com';
+
+export const ALLAH_NAMES = [
+  {
+    id: 'ar-rahman',
+    name: 'Ar-Rahman',
+    arabic: 'الرَّحْمَٰن',
+    meaning: 'The Most Compassionate',
+    reference: 'Qur’an 59:22',
+    url: 'https://quran.com/59/22',
+  },
+  {
+    id: 'ar-raheem',
+    name: 'Ar-Raheem',
+    arabic: 'الرَّحِيم',
+    meaning: 'The Most Merciful',
+    reference: 'Qur’an 59:22',
+    url: 'https://quran.com/59/22',
+  },
+  {
+    id: 'al-malik',
+    name: 'Al-Malik',
+    arabic: 'الْمَلِك',
+    meaning: 'The King',
+    reference: 'Qur’an 59:23',
+    url: 'https://quran.com/59/23',
+  },
+  {
+    id: 'al-quddus',
+    name: 'Al-Quddus',
+    arabic: 'الْقُدُّوس',
+    meaning: 'The Most Holy',
+    reference: 'Qur’an 59:23',
+    url: 'https://quran.com/59/23',
+  },
+  {
+    id: 'as-salam',
+    name: 'As-Salam',
+    arabic: 'السَّلَام',
+    meaning: 'The Source of Peace',
+    reference: 'Qur’an 59:23',
+    url: 'https://quran.com/59/23',
+  },
+  {
+    id: 'al-aziz',
+    name: 'Al-Aziz',
+    arabic: 'الْعَزِيز',
+    meaning: 'The Almighty',
+    reference: 'Qur’an 59:23',
+    url: 'https://quran.com/59/23',
+  },
+  {
+    id: 'al-khaliq',
+    name: 'Al-Khaliq',
+    arabic: 'الْخَالِق',
+    meaning: 'The Creator',
+    reference: 'Qur’an 59:24',
+    url: 'https://quran.com/59/24',
+  },
+  {
+    id: 'al-bari',
+    name: 'Al-Bari',
+    arabic: 'الْبَارِئ',
+    meaning: 'The Originator',
+    reference: 'Qur’an 59:24',
+    url: 'https://quran.com/59/24',
+  },
+  {
+    id: 'al-musawwir',
+    name: 'Al-Musawwir',
+    arabic: 'الْمُصَوِّر',
+    meaning: 'The Fashioner',
+    reference: 'Qur’an 59:24',
+    url: 'https://quran.com/59/24',
+  },
+  {
+    id: 'al-hakim',
+    name: 'Al-Hakim',
+    arabic: 'الْحَكِيم',
+    meaning: 'The All-Wise',
+    reference: 'Qur’an 59:24',
+    url: 'https://quran.com/59/24',
+  },
+] as const;
+
+export const PROPHET_NAMES = [
+  {
+    id: 'muhammad',
+    name: 'Muhammad',
+    arabic: 'مُحَمَّد',
+    meaning: 'A name of the Prophet ﷺ; commonly understood as “the praised one.”',
+  },
+  {
+    id: 'ahmad',
+    name: 'Ahmad',
+    arabic: 'أَحْمَد',
+    meaning: 'A name of the Prophet ﷺ; commonly understood as “the most praiseworthy.”',
+  },
+  {
+    id: 'al-mahi',
+    name: 'Al-Mahi',
+    arabic: 'الْمَاحِي',
+    meaning: 'Through him, Allah removes disbelief.',
+  },
+  {
+    id: 'al-hashir',
+    name: 'Al-Hashir',
+    arabic: 'الْحَاشِر',
+    meaning: 'The one after whom people will be gathered.',
+  },
+  {
+    id: 'al-aqib',
+    name: 'Al-Aqib',
+    arabic: 'الْعَاقِب',
+    meaning: 'The last Prophet; no Prophet comes after him.',
+  },
+].map((name) => ({
+  ...name,
+  reference: 'Sahih al-Bukhari 3532',
+  url: 'https://sunnah.com/bukhari:3532',
+  additionalReference: 'Sahih Muslim 2354a',
+  additionalUrl: 'https://sunnah.com/muslim:2354a',
+}));

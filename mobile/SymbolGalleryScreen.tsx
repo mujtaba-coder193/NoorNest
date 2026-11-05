@@ -14,10 +14,10 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { COUNTRY_SYMBOLS_BY_CODE, COUNTRY_SYMBOLS_NOTICE } from './countrySymbols';
 import { findCommonsPhotos, type CommonsPhoto } from './commonsMedia';
+import { NATURE_WORDS, type NatureCategory } from './natureContent';
 
-type SymbolCategory = 'animal' | 'bird' | 'fish' | 'flower';
+type SymbolCategory = NatureCategory;
 
 type SymbolEntry = {
   key: string;
@@ -55,8 +55,6 @@ const CATEGORY_EMOJI: Record<SymbolCategory, string> = {
   fish: '🐟',
   flower: '🌼',
 };
-
-const FISH_SPECIES = new Set(['blue marlin', 'flying fish', 'koi']);
 
 const soundCache = new Map<string, Promise<LicensedSound | null>>();
 const ALLOWED_SOUND_LICENSES = new Set(['cc0', 'cc-by', 'cc-by-sa']);
@@ -121,38 +119,15 @@ function findLicensedSound(searchName: string): Promise<LicensedSound | null> {
   return request;
 }
 
-function getUniqueEntries(): SymbolEntry[] {
-  const seen = new Set<string>();
-  const entries: SymbolEntry[] = [];
-  const categoryOrder: SymbolCategory[] = ['bird', 'fish', 'animal', 'flower'];
-
-  for (const category of categoryOrder) {
-    for (const symbols of Object.values(COUNTRY_SYMBOLS_BY_CODE)) {
-      const sourceCategory = category === 'fish' ? 'animal' : category;
-      const symbol = symbols[sourceCategory];
-      if (!symbol || symbol.trim().startsWith('—')) continue;
-      const normalizedName = cleanSearchName(symbol).toLocaleLowerCase();
-      if (category === 'fish' && !FISH_SPECIES.has(normalizedName)) continue;
-      if (category === 'animal' && FISH_SPECIES.has(normalizedName)) continue;
-      if (!normalizedName || seen.has(normalizedName)) continue;
-      seen.add(normalizedName);
-      entries.push({ key: `${category}-${normalizedName}`, category, symbol });
-    }
-  }
-
-  return entries.sort((first, second) =>
-    cleanSearchName(first.symbol).localeCompare(cleanSearchName(second.symbol), 'en'),
-  );
-}
-
 export default function SymbolGalleryScreen({ onBack }: SymbolGalleryScreenProps) {
   const [category, setCategory] = useState<SymbolCategory>('animal');
   const [query, setQuery] = useState('');
   const [selectedSymbol, setSelectedSymbol] = useState<SelectedSymbol | null>(null);
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  const entries = getUniqueEntries()
+  const entries = NATURE_WORDS
     .filter((entry) => entry.category === category)
-    .filter((entry) => entry.symbol.toLocaleLowerCase().includes(normalizedQuery));
+    .filter((entry) => entry.name.toLocaleLowerCase().includes(normalizedQuery))
+    .map((entry) => ({ ...entry, symbol: entry.name }));
 
   const renderHeader = () => (
     <View>
@@ -171,7 +146,7 @@ export default function SymbolGalleryScreen({ onBack }: SymbolGalleryScreenProps
       <View style={styles.intro}>
         <Text style={styles.eyebrow}>DUNYA · NATURE</Text>
         <Text style={styles.title}>Animals, birds, fish & flowers</Text>
-        <Text style={styles.description}>Browse distinct species and flowers, with three pictures to explore.</Text>
+        <Text style={styles.description}>Big, familiar nature words to look at and listen to.</Text>
       </View>
       <View style={styles.categoryPicker}>
         {CATEGORIES.map((item) => {
@@ -193,7 +168,7 @@ export default function SymbolGalleryScreen({ onBack }: SymbolGalleryScreenProps
         })}
       </View>
       <TextInput
-        accessibilityLabel={`Search ${category} and countries`}
+        accessibilityLabel={`Search ${category}`}
         placeholder={`Find a ${category === 'fish' ? 'fish' : category.slice(0, -1)}`}
         placeholderTextColor="#71817D"
         value={query}
@@ -202,7 +177,7 @@ export default function SymbolGalleryScreen({ onBack }: SymbolGalleryScreenProps
         returnKeyType="search"
         style={styles.searchInput}
       />
-      <Text style={styles.resultCount}>{entries.length} SYMBOLS</Text>
+      <Text style={styles.resultCount}>{entries.length} WORDS</Text>
     </View>
   );
 
@@ -233,7 +208,7 @@ export default function SymbolGalleryScreen({ onBack }: SymbolGalleryScreenProps
         ListEmptyComponent={<Text style={styles.emptyState}>No symbols match that search.</Text>}
         ListFooterComponent={(
           <View style={styles.footer}>
-            <Text style={styles.notice}>{COUNTRY_SYMBOLS_NOTICE}</Text>
+            <Text style={styles.notice}>A little collection of familiar nature words for curious learners.</Text>
             <Text style={styles.imageNotice}>Photos come from Wikimedia Commons. Tap a photo to view it and its attribution.</Text>
           </View>
         )}

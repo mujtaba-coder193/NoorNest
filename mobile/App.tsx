@@ -6,6 +6,8 @@ import { DAILY_DUAS, QURAN_SURAHS, QURAN_TRANSLATION_SOURCE } from './deenConten
 import CountriesScreen from './CountriesScreen';
 import FoodGalleryScreen from './FoodGalleryScreen';
 import SymbolGalleryScreen from './SymbolGalleryScreen';
+import ColorShapesScreen from './ColorShapesScreen';
+import BeautifulNamesScreen from './BeautifulNamesScreen';
 import NumbersScreen from './NumbersScreen';
 import {
   Pressable,
@@ -81,11 +83,12 @@ type LearningModule = {
   description: string;
   icon: string;
   tint: string;
-  route?: 'alphabet' | 'countries' | 'daily-duas' | 'food' | 'numbers' | 'quran' | 'symbols';
+  route?: 'alphabet' | 'allah-names' | 'colors-shapes' | 'countries' | 'daily-duas' | 'food' | 'numbers' | 'prophet-names' | 'quran' | 'symbols';
 };
 
 const DUNYA_MODULES: LearningModule[] = [
   { title: 'Letters', description: 'English A to Z', icon: 'Aa', tint: '#FCE1D8', route: 'alphabet' },
+  { title: 'Colors & shapes', description: 'Bright colors and big shapes', icon: '🎨', tint: '#FCE1D8', route: 'colors-shapes' },
   { title: 'Countries', description: 'Flags, capitals and quick facts', icon: '🌍', tint: '#DCEAF3', route: 'countries' },
   { title: 'Numbers', description: 'Count from 1 to 20', icon: '123', tint: '#FCECC3', route: 'numbers' },
   { title: 'Nature', description: 'Animals, birds, fish & flowers', icon: '🌿', tint: '#DCEFE5', route: 'symbols' },
@@ -95,10 +98,12 @@ const DUNYA_MODULES: LearningModule[] = [
 const DEEN_MODULES: LearningModule[] = [
   { title: 'Daily duas', description: 'Small words for everyday moments', icon: '🤲', tint: '#FCECC3', route: 'daily-duas' },
   { title: 'Qur’an', description: 'Al-Fatihah and the three Quls', icon: '📖', tint: '#DCEFE5', route: 'quran' },
+  { title: 'Names of Allah', description: 'Beautiful names and meanings', icon: '✨', tint: '#FCECC3', route: 'allah-names' },
+  { title: 'Prophet Muhammad ﷺ', description: 'Names from an authentic hadith', icon: '🌙', tint: '#DCEAF3', route: 'prophet-names' },
 ];
 
 export default function App() {
-  const [screen, setScreen] = useState<'home' | 'alphabet' | 'countries' | 'daily-duas' | 'food' | 'numbers' | 'quran' | 'symbols'>('home');
+  const [screen, setScreen] = useState<'home' | 'alphabet' | 'allah-names' | 'colors-shapes' | 'countries' | 'daily-duas' | 'food' | 'numbers' | 'prophet-names' | 'quran' | 'symbols'>('home');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedDuaIndex, setSelectedDuaIndex] = useState(0);
   const [selectedSurahIndex, setSelectedSurahIndex] = useState(0);
@@ -271,7 +276,7 @@ export default function App() {
               <Text style={styles.sectionTitle}>Dunya</Text>
               <Text style={styles.sectionDescription}>Things to name together</Text>
             </View>
-            <Text style={styles.sectionCount}>5 PATHS</Text>
+            <Text style={styles.sectionCount}>6 PATHS</Text>
           </View>
           <View style={styles.moduleGrid}>{renderModuleCards(DUNYA_MODULES)}</View>
 
@@ -280,7 +285,7 @@ export default function App() {
               <Text style={styles.sectionTitle}>Deen</Text>
               <Text style={styles.sectionDescription}>Gentle moments of faith</Text>
             </View>
-            <Text style={styles.sectionCount}>2 PATHS</Text>
+            <Text style={styles.sectionCount}>4 PATHS</Text>
           </View>
           <View style={styles.moduleGrid}>{renderModuleCards(DEEN_MODULES)}</View>
 
@@ -577,6 +582,12 @@ export default function App() {
               </Text>
             </View>
           </ScrollView>
+        ) : screen === 'allah-names' ? (
+          <BeautifulNamesScreen group="allah" onBack={() => setScreen('home')} />
+        ) : screen === 'prophet-names' ? (
+          <BeautifulNamesScreen group="prophet" onBack={() => setScreen('home')} />
+        ) : screen === 'colors-shapes' ? (
+          <ColorShapesScreen onBack={() => setScreen('home')} />
         ) : screen === 'countries' ? (
           <CountriesScreen onBack={() => setScreen('home')} />
         ) : screen === 'symbols' ? (
