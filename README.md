@@ -101,7 +101,10 @@ page. Verify each image's relevance and usage terms before public release.
 7. Start the tunnel in that same terminal:
 
 	```bash
-	npx expo start --tunnel
+		npx expo lint
+		npx tsc --noEmit
+		npx expo-doctor
+		npx expo start --tunnel
 	```
 
 8. When the Expo QR appears, scan it with the iPhone Camera app and tap

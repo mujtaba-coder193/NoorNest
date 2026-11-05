@@ -2,13 +2,25 @@ import { StatusBar } from 'expo-status-bar';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import * as Speech from 'expo-speech';
 import { type ComponentRef, useEffect, useRef, useState } from 'react';
-import { DAILY_DUAS, QURAN_SURAHS, QURAN_TRANSLATION_SOURCE } from './deenContent';
+import {
+  DAILY_DUAS,
+  QURAN_SURAHS,
+  QURAN_TRANSLATION_SOURCE,
+  TEN_COMPANIONS,
+  PROPHET_WIVES,
+  STARTER_ANGELS,
+  EVERYDAY_PHRASES,
+  ALL_25_PROPHETS,
+  EVERYDAY_MANNERS,
+} from './deenContent';
 import CountriesScreen from './CountriesScreen';
 import FoodGalleryScreen from './FoodGalleryScreen';
 import SymbolGalleryScreen from './SymbolGalleryScreen';
 import ColorShapesScreen from './ColorShapesScreen';
 import BeautifulNamesScreen from './BeautifulNamesScreen';
 import NumbersScreen from './NumbersScreen';
+import DeenCollectionScreen from './DeenCollectionScreen';
+import OppositesScreen from './OppositesScreen';
 import {
   Pressable,
   Linking,
@@ -78,17 +90,37 @@ const LETTER_NAMES: Record<string, string> = {
   Z: 'zee',
 };
 
+type RouteType =
+  | 'alphabet'
+  | 'allah-names'
+  | 'colors-shapes'
+  | 'countries'
+  | 'daily-duas'
+  | 'food'
+  | 'numbers'
+  | 'prophet-names'
+  | 'quran'
+  | 'symbols'
+  | 'ten-companions'
+  | 'prophet-wives'
+  | 'angels'
+  | 'everyday-phrases'
+  | 'starter-prophets'
+  | 'everyday-manners'
+  | 'opposites';
+
 type LearningModule = {
   title: string;
   description: string;
   icon: string;
   tint: string;
-  route?: 'alphabet' | 'allah-names' | 'colors-shapes' | 'countries' | 'daily-duas' | 'food' | 'numbers' | 'prophet-names' | 'quran' | 'symbols';
+  route?: RouteType;
 };
 
 const DUNYA_MODULES: LearningModule[] = [
   { title: 'Letters', description: 'English A to Z', icon: 'Aa', tint: '#FCE1D8', route: 'alphabet' },
   { title: 'Colors & shapes', description: 'Bright colors and big shapes', icon: '🎨', tint: '#FCE1D8', route: 'colors-shapes' },
+  { title: 'Opposites & concepts', description: 'Big & small, day & night', icon: '⚖️', tint: '#FCECC3', route: 'opposites' },
   { title: 'Countries', description: 'Flags, capitals and quick facts', icon: '🌍', tint: '#DCEAF3', route: 'countries' },
   { title: 'Numbers', description: 'Count from 1 to 20', icon: '123', tint: '#FCECC3', route: 'numbers' },
   { title: 'Nature', description: 'Animals, birds, fish & flowers', icon: '🌿', tint: '#DCEFE5', route: 'symbols' },
@@ -100,10 +132,16 @@ const DEEN_MODULES: LearningModule[] = [
   { title: 'Qur’an', description: 'Al-Fatihah and the three Quls', icon: '📖', tint: '#DCEFE5', route: 'quran' },
   { title: 'Names of Allah', description: 'Beautiful names and meanings', icon: '✨', tint: '#FCECC3', route: 'allah-names' },
   { title: 'Prophet Muhammad ﷺ', description: 'Names from an authentic hadith', icon: '🌙', tint: '#DCEAF3', route: 'prophet-names' },
+  { title: 'Everyday Phrases', description: 'Bismillah, Salam, and gratitude', icon: '💬', tint: '#FCE1D8', route: 'everyday-phrases' },
+  { title: 'Everyday Manners', description: 'Eating, cleanliness, and kindness', icon: '☀️', tint: '#FCECC3', route: 'everyday-manners' },
+  { title: '25 Prophets & Lineage', description: 'All Qur’anic prophets & tree', icon: '🌿', tint: '#DCEFE5', route: 'starter-prophets' },
+  { title: '10 Companions', description: 'Companions promised Jannah', icon: '⭐', tint: '#FCECC3', route: 'ten-companions' },
+  { title: 'Mothers of Believers', description: 'Wives of Prophet Muhammad ﷺ', icon: '🌸', tint: '#DCEAF3', route: 'prophet-wives' },
+  { title: 'Angels in Sources', description: 'Named angels from authentic reports', icon: '✨', tint: '#DCEFE5', route: 'angels' },
 ];
 
 export default function App() {
-  const [screen, setScreen] = useState<'home' | 'alphabet' | 'allah-names' | 'colors-shapes' | 'countries' | 'daily-duas' | 'food' | 'numbers' | 'prophet-names' | 'quran' | 'symbols'>('home');
+  const [screen, setScreen] = useState<'home' | RouteType>('home');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedDuaIndex, setSelectedDuaIndex] = useState(0);
   const [selectedSurahIndex, setSelectedSurahIndex] = useState(0);
@@ -233,151 +271,164 @@ export default function App() {
         {screen === 'home' ? (
           <ScrollView contentContainerStyle={styles.homeScrollContent}>
             <View style={[styles.homeContent, isWide && styles.homeContentWide]}>
-          <View style={styles.header}>
-            <View style={styles.brandMark}>
-              <Text style={styles.brandMarkText}>N</Text>
-            </View>
-            <View>
-              <Text style={styles.brandName}>NoorNest</Text>
-              <Text style={styles.brandCaption}>GROWING IN FAITH & WONDER</Text>
-            </View>
-            <View style={styles.languagePill}>
-              <Text style={styles.languageText}>EN</Text>
-            </View>
-          </View>
+              <View style={styles.header}>
+                <View style={styles.brandMark}>
+                  <Text style={styles.brandMarkText}>N</Text>
+                </View>
+                <View>
+                  <Text style={styles.brandName}>NoorNest</Text>
+                  <Text style={styles.brandCaption}>GROWING IN FAITH & WONDER</Text>
+                </View>
+                <View style={styles.languagePill}>
+                  <Text style={styles.languageText}>EN</Text>
+                </View>
+              </View>
 
-          <View style={styles.homeIntro}>
-            <Text style={styles.homeEyebrow}>MADE FOR LITTLE MOMENTS</Text>
-            <Text style={styles.homeTitle}>A little moment{ '\n' }to share</Text>
-          </View>
+              <View style={styles.homeIntro}>
+                <Text style={styles.homeEyebrow}>MADE FOR LITTLE MOMENTS</Text>
+                <Text style={styles.homeTitle}>A little moment{ '\n' }to share</Text>
+              </View>
 
-          <View style={[styles.homeHero, isWide && styles.homeHeroWide]}>
-            <View style={styles.heroCopy}>
-              <Text style={styles.heroEyebrow}>GROWING TOGETHER</Text>
-              <Text style={styles.heroTitle}>One little sound,{ '\n' }a lovely moment.</Text>
-              <Text style={styles.heroDescription}>A gentle, grown-up-guided moment for letters, words and faith.</Text>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => setScreen('alphabet')}
-                style={({ pressed }) => [styles.heroButton, pressed && styles.pressed]}
-              >
-                <Text style={styles.heroButtonText}>Begin together</Text>
-                <Text style={styles.heroButtonArrow}>›</Text>
-              </Pressable>
-            </View>
-            <View style={styles.heroArt} accessibilityElementsHidden>
-              <Text style={styles.heroLetters}>Aa</Text>
-              <Text style={styles.heroApple}>🍎</Text>
-            </View>
-          </View>
+              <View style={[styles.homeHero, isWide && styles.homeHeroWide]}>
+                <View style={styles.heroCopy}>
+                  <Text style={styles.heroEyebrow}>GROWING TOGETHER</Text>
+                  <Text style={styles.heroTitle}>One little sound,{ '\n' }a lovely moment.</Text>
+                  <Text style={styles.heroDescription}>A gentle, grown-up-guided moment for letters, words and faith.</Text>
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => setScreen('alphabet')}
+                    style={({ pressed }) => [styles.heroButton, pressed && styles.pressed]}
+                  >
+                    <Text style={styles.heroButtonText}>Begin together</Text>
+                    <Text style={styles.heroButtonArrow}>›</Text>
+                  </Pressable>
+                </View>
+                <View style={styles.heroArt} accessibilityElementsHidden>
+                  <Text style={styles.heroLetters}>Aa</Text>
+                  <Text style={styles.heroApple}>🍎</Text>
+                </View>
+              </View>
 
-          <View style={styles.sectionHeading}>
-            <View>
-              <Text style={styles.sectionTitle}>Dunya</Text>
-              <Text style={styles.sectionDescription}>Things to name together</Text>
-            </View>
-            <Text style={styles.sectionCount}>6 PATHS</Text>
-          </View>
-          <View style={styles.moduleGrid}>{renderModuleCards(DUNYA_MODULES)}</View>
+              <View style={styles.sectionHeading}>
+                <View>
+                  <Text style={styles.sectionTitle}>Dunya</Text>
+                  <Text style={styles.sectionDescription}>Things to name together</Text>
+                </View>
+                <Text style={styles.sectionCount}>7 PATHS</Text>
+              </View>
+              <View style={styles.moduleGrid}>{renderModuleCards(DUNYA_MODULES)}</View>
 
-          <View style={styles.sectionHeading}>
-            <View>
-              <Text style={styles.sectionTitle}>Deen</Text>
-              <Text style={styles.sectionDescription}>Gentle moments of faith</Text>
-            </View>
-            <Text style={styles.sectionCount}>4 PATHS</Text>
-          </View>
-          <View style={styles.moduleGrid}>{renderModuleCards(DEEN_MODULES)}</View>
+              <View style={styles.sectionHeading}>
+                <View>
+                  <Text style={styles.sectionTitle}>Deen</Text>
+                  <Text style={styles.sectionDescription}>Gentle moments of faith</Text>
+                </View>
+                <Text style={styles.sectionCount}>10 PATHS</Text>
+              </View>
+              <View style={styles.moduleGrid}>{renderModuleCards(DEEN_MODULES)}</View>
 
-          <View style={styles.languageNote}>
-            <Text style={styles.languageNoteText}>English first</Text>
-            <Text style={styles.languageNoteSubtext}>Arabic, Urdu and Norwegian will follow.</Text>
-          </View>
-          </View>
-            </ScrollView>
-          ) : screen === 'alphabet' ? (
+              <View style={styles.languageNote}>
+                <Text style={styles.languageNoteText}>English first</Text>
+                <Text style={styles.languageNoteSubtext}>Arabic, Urdu and Norwegian will follow.</Text>
+              </View>
+            </View>
+          </ScrollView>
+        ) : screen === 'opposites' ? (
+          <OppositesScreen onBack={() => setScreen('home')} />
+        ) : screen === 'everyday-manners' ? (
+          <DeenCollectionScreen group="everyday-manners" items={EVERYDAY_MANNERS} onBack={() => setScreen('home')} />
+        ) : screen === 'everyday-phrases' ? (
+          <DeenCollectionScreen group="everyday-phrases" items={EVERYDAY_PHRASES} onBack={() => setScreen('home')} />
+        ) : screen === 'starter-prophets' ? (
+          <DeenCollectionScreen group="starter-prophets" items={ALL_25_PROPHETS} onBack={() => setScreen('home')} />
+        ) : screen === 'ten-companions' ? (
+          <DeenCollectionScreen group="ten-companions" items={TEN_COMPANIONS} onBack={() => setScreen('home')} />
+        ) : screen === 'prophet-wives' ? (
+          <DeenCollectionScreen group="prophet-wives" items={PROPHET_WIVES} onBack={() => setScreen('home')} />
+        ) : screen === 'angels' ? (
+          <DeenCollectionScreen group="angels" items={STARTER_ANGELS} onBack={() => setScreen('home')} />
+        ) : screen === 'alphabet' ? (
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.content}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Back to home"
-              onPress={() => setScreen('home')}
-              style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-            >
-              <Text style={styles.backArrow}>‹</Text>
-              <Text style={styles.backLabel}>Home</Text>
-            </Pressable>
-
-            <View style={styles.header}>
-              <View style={styles.brandMark}>
-                <Text style={styles.brandMarkText}>N</Text>
-              </View>
-              <View>
-                <Text style={styles.brandName}>NoorNest</Text>
-                <Text style={styles.brandCaption}>GROWING IN FAITH & WONDER</Text>
-              </View>
-              <View style={styles.languagePill}>
-                <Text style={styles.languageText}>EN</Text>
-              </View>
-            </View>
-
-            <View style={styles.titleBlock}>
-              <Text style={styles.eyebrow}>A SHARED ENGLISH MOMENT</Text>
-              <Text style={styles.title}>Let’s explore{ '\n' }letters together</Text>
-            </View>
-
-            <View style={styles.lessonCard}>
-              <View style={styles.lessonCopy}>
-                <Text style={styles.lessonEyebrow}>{current.letter} IS FOR</Text>
-                <Text style={styles.bigLetter}>{current.letter}</Text>
-                <Text style={styles.word}>{current.word}</Text>
-              </View>
-              <View style={styles.pictureWell}>
-                <Text style={styles.picture}>{current.picture}</Text>
-              </View>
-            </View>
-
-            <View style={styles.actions}>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Hear the letter ${current.letter}`}
-                onPress={() => speak(LETTER_NAMES[current.letter])}
-                style={({ pressed }) => [styles.hearButton, pressed && styles.pressed]}
+                accessibilityLabel="Back to home"
+                onPress={() => setScreen('home')}
+                style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
               >
-                <Text style={styles.hearIcon}>♫</Text>
-                <Text style={styles.hearLabel}>Hear letter</Text>
+                <Text style={styles.backArrow}>‹</Text>
+                <Text style={styles.backLabel}>Home</Text>
               </Pressable>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Hear the word ${current.word}`}
-                onPress={() => speak(current.word)}
-                style={({ pressed }) => [styles.wordButton, pressed && styles.pressed]}
-              >
-                <Text style={styles.wordIcon}>◖</Text>
-                <Text style={styles.wordButtonLabel}>Hear word</Text>
-              </Pressable>
-            </View>
 
-            <View style={styles.navigation}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Previous letter"
-                onPress={() => moveLetter(-1)}
-                style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}
-              >
-                <Text style={styles.navArrow}>‹</Text>
-              </Pressable>
-              <Text style={styles.navHint}>A QUIET MOMENT TOGETHER</Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Next letter"
-                onPress={() => moveLetter(1)}
-                style={({ pressed }) => [styles.navButton, styles.nextButton, pressed && styles.pressed]}
-              >
-                <Text style={[styles.navArrow, styles.nextArrow]}>›</Text>
-              </Pressable>
-            </View>
+              <View style={styles.header}>
+                <View style={styles.brandMark}>
+                  <Text style={styles.brandMarkText}>N</Text>
+                </View>
+                <View>
+                  <Text style={styles.brandName}>NoorNest</Text>
+                  <Text style={styles.brandCaption}>GROWING IN FAITH & WONDER</Text>
+                </View>
+                <View style={styles.languagePill}>
+                  <Text style={styles.languageText}>EN</Text>
+                </View>
+              </View>
 
+              <View style={styles.titleBlock}>
+                <Text style={styles.eyebrow}>A SHARED ENGLISH MOMENT</Text>
+                <Text style={styles.title}>Let’s explore{ '\n' }letters together</Text>
+              </View>
+
+              <View style={styles.lessonCard}>
+                <View style={styles.lessonCopy}>
+                  <Text style={styles.lessonEyebrow}>{current.letter} IS FOR</Text>
+                  <Text style={styles.bigLetter}>{current.letter}</Text>
+                  <Text style={styles.word}>{current.word}</Text>
+                </View>
+                <View style={styles.pictureWell}>
+                  <Text style={styles.picture}>{current.picture}</Text>
+                </View>
+              </View>
+
+              <View style={styles.actions}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Hear the letter ${current.letter}`}
+                  onPress={() => speak(LETTER_NAMES[current.letter])}
+                  style={({ pressed }) => [styles.hearButton, pressed && styles.pressed]}
+                >
+                  <Text style={styles.hearIcon}>♫</Text>
+                  <Text style={styles.hearLabel}>Hear letter</Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Hear the word ${current.word}`}
+                  onPress={() => speak(current.word)}
+                  style={({ pressed }) => [styles.wordButton, pressed && styles.pressed]}
+                >
+                  <Text style={styles.wordIcon}>◖</Text>
+                  <Text style={styles.wordButtonLabel}>Hear word</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.navigation}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Previous letter"
+                  onPress={() => moveLetter(-1)}
+                  style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}
+                >
+                  <Text style={styles.navArrow}>‹</Text>
+                </Pressable>
+                <Text style={styles.navHint}>A QUIET MOMENT TOGETHER</Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Next letter"
+                  onPress={() => moveLetter(1)}
+                  style={({ pressed }) => [styles.navButton, styles.nextButton, pressed && styles.pressed]}
+                >
+                  <Text style={[styles.navArrow, styles.nextArrow]}>›</Text>
+                </Pressable>
+              </View>
             </View>
           </ScrollView>
         ) : screen === 'daily-duas' ? (
@@ -561,19 +612,19 @@ export default function App() {
               {currentSurah.verses.map((verse, index) => {
                 const isActiveVerse = index === activeVerseIndex;
                 return (
-                <View
-                  key={`${currentSurah.number}:${index + 1}`}
-                  onLayout={(event) => {
-                    verseOffsetsRef.current[index] = event.nativeEvent.layout.y;
-                  }}
-                  style={[styles.quranVerse, isActiveVerse && styles.activeQuranVerse]}
-                >
-                  <View style={[styles.verseNumber, isActiveVerse && styles.activeVerseNumber]}>
-                    <Text style={styles.verseNumberText}>{index + 1}</Text>
+                  <View
+                    key={`${currentSurah.number}:${index + 1}`}
+                    onLayout={(event) => {
+                      verseOffsetsRef.current[index] = event.nativeEvent.layout.y;
+                    }}
+                    style={[styles.quranVerse, isActiveVerse && styles.activeQuranVerse]}
+                  >
+                    <View style={[styles.verseNumber, isActiveVerse && styles.activeVerseNumber]}>
+                      <Text style={styles.verseNumberText}>{index + 1}</Text>
+                    </View>
+                    <Text style={[styles.quranArabic, isActiveVerse && styles.activeQuranArabic]}>{verse.arabic}</Text>
+                    <Text style={styles.quranTranslation}>{verse.translation}</Text>
                   </View>
-                  <Text style={[styles.quranArabic, isActiveVerse && styles.activeQuranArabic]}>{verse.arabic}</Text>
-                  <Text style={styles.quranTranslation}>{verse.translation}</Text>
-                </View>
                 );
               })}
 
@@ -608,688 +659,119 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F7F9F5',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 22,
-    paddingTop: 16,
-    paddingBottom: 32,
-  },
-  content: {
-    width: '100%',
-    maxWidth: 620,
-    alignSelf: 'center',
-  },
-  homeScrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 36,
-  },
-  homeContent: {
-    width: '100%',
-    maxWidth: 620,
-    alignSelf: 'center',
-  },
-  homeContentWide: {
-    maxWidth: 960,
-  },
-  homeIntro: {
-    marginTop: 28,
-    marginBottom: 18,
-  },
-  homeEyebrow: {
-    color: '#D46C53',
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-    marginBottom: 6,
-  },
-  homeTitle: {
-    color: '#183B38',
-    fontSize: 29,
-    lineHeight: 34,
-    fontWeight: '800',
-  },
-  homeHero: {
-    minHeight: 190,
-    borderRadius: 22,
-    paddingHorizontal: 20,
-    paddingVertical: 18,
-    backgroundColor: '#176B67',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    overflow: 'hidden',
-  },
-  homeHeroWide: {
-    minHeight: 218,
-    paddingHorizontal: 30,
-    paddingVertical: 24,
-  },
-  heroCopy: {
-    flex: 1,
-    paddingRight: 8,
-  },
-  heroEyebrow: {
-    color: '#BFE9E2',
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-    marginBottom: 8,
-  },
-  heroTitle: {
-    color: '#FFFFFF',
-    fontSize: 23,
-    lineHeight: 28,
-    fontWeight: '800',
-  },
-  heroDescription: {
-    color: '#D9EFEB',
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 8,
-  },
-  heroButton: {
-    minHeight: 42,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 14,
-    marginTop: 14,
-    borderRadius: 12,
-    backgroundColor: '#FFC857',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  heroButtonText: {
-    color: '#243D39',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  heroButtonArrow: {
-    color: '#243D39',
-    fontSize: 24,
-    lineHeight: 26,
-    marginLeft: 10,
-    marginTop: -2,
-  },
-  heroArt: {
-    width: 108,
-    height: 138,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#27847D',
-    borderRadius: 18,
-    transform: [{ rotate: '4deg' }],
-  },
-  heroLetters: {
-    color: '#FFFFFF',
-    fontSize: 38,
-    lineHeight: 44,
-    fontWeight: '800',
-  },
-  heroApple: {
-    fontSize: 38,
-    marginTop: 6,
-  },
-  sectionHeading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 25,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    color: '#183B38',
-    fontSize: 21,
-    lineHeight: 26,
-    fontWeight: '800',
-  },
-  sectionDescription: {
-    color: '#71817D',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  sectionCount: {
-    color: '#71817D',
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.7,
-  },
-  moduleGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: 10,
-  },
-  moduleCard: {
-    width: '48.8%',
-    minHeight: 118,
-    padding: 12,
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E8ECE7',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  availableModuleCard: {
-    borderColor: '#176B67',
-  },
-  moduleIconWell: {
-    width: 42,
-    height: 42,
-    borderRadius: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  moduleIcon: {
-    fontSize: 23,
-    fontWeight: '800',
-    color: '#183B38',
-  },
-  moduleIconText: {
-    fontSize: 15,
-  },
-  moduleCopy: {
-    flex: 1,
-    minWidth: 0,
-    marginLeft: 10,
-  },
-  moduleTitle: {
-    color: '#183B38',
-    fontSize: 13,
-    lineHeight: 17,
-    fontWeight: '800',
-  },
-  moduleDescription: {
-    color: '#71817D',
-    fontSize: 10,
-    lineHeight: 14,
-    marginTop: 3,
-  },
-  moduleStatus: {
-    color: '#A7ADA8',
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-    marginTop: 8,
-  },
-  availableStatus: {
-    color: '#176B67',
-  },
-  moduleArrow: {
-    color: '#176B67',
-    fontSize: 21,
-    lineHeight: 24,
-    marginLeft: 3,
-  },
-  languageNote: {
-    borderTopWidth: 1,
-    borderTopColor: '#E3EAE5',
-    marginTop: 26,
-    paddingTop: 14,
-  },
-  languageNoteText: {
-    color: '#183B38',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  languageNoteSubtext: {
-    color: '#71817D',
-    fontSize: 11,
-    marginTop: 3,
-  },
-  backButton: {
-    minHeight: 38,
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    paddingRight: 12,
-  },
-  backArrow: {
-    color: '#176B67',
-    fontSize: 28,
-    lineHeight: 32,
-    marginRight: 5,
-    marginTop: -3,
-  },
-  backLabel: {
-    color: '#176B67',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  brandMark: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: '#176B67',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  brandMarkText: {
-    color: '#FFFFFF',
-    fontSize: 24,
-    fontWeight: '800',
-  },
-  brandName: {
-    color: '#183B38',
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  brandCaption: {
-    color: '#71817D',
-    fontSize: 8,
-    fontWeight: '700',
-    letterSpacing: 0.7,
-    marginTop: 2,
-  },
-  languagePill: {
-    marginLeft: 'auto',
-    minWidth: 42,
-    height: 34,
-    paddingHorizontal: 10,
-    borderRadius: 17,
-    backgroundColor: '#E5F1EC',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  languageText: {
-    color: '#176B67',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  titleBlock: {
-    marginTop: 30,
-    marginBottom: 20,
-  },
-  eyebrow: {
-    color: '#D46C53',
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1,
-    marginBottom: 8,
-  },
-  title: {
-    color: '#183B38',
-    fontSize: 32,
-    lineHeight: 36,
-    fontWeight: '800',
-  },
-  routinePicker: {
-    flexDirection: 'row',
-    paddingRight: 20,
-    marginBottom: 14,
-  },
-  routineTab: {
-    minHeight: 44,
-    paddingHorizontal: 14,
-    marginRight: 8,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E5EAE5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  selectedRoutineTab: {
-    backgroundColor: '#176B67',
-    borderColor: '#176B67',
-  },
-  routineTabText: {
-    color: '#35534F',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  selectedRoutineTabText: {
-    color: '#FFFFFF',
-  },
-  surahPicker: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: 8,
-    marginBottom: 18,
-  },
-  surahTab: {
-    width: '48.8%',
-    minHeight: 64,
-    padding: 10,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E5EAE5',
-  },
-  selectedSurahTab: {
-    backgroundColor: '#176B67',
-    borderColor: '#176B67',
-  },
-  surahTabTitle: {
-    color: '#183B38',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  surahTabArabic: {
-    color: '#71817D',
-    fontSize: 16,
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    marginTop: 3,
-  },
-  selectedSurahTabTitle: {
-    color: '#FFFFFF',
-  },
-  surahHeading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 2,
-    marginBottom: 8,
-  },
-  surahHeadingTitle: {
-    color: '#183B38',
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  surahHeadingArabic: {
-    color: '#176B67',
-    fontSize: 20,
-    writingDirection: 'rtl',
-  },
-  recitationButton: {
-    minHeight: 72,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    backgroundColor: '#176B67',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  recitationIcon: {
-    width: 30,
-    color: '#FFFFFF',
-    fontSize: 21,
-    fontWeight: '800',
-    textAlign: 'center',
-    marginRight: 12,
-  },
-  recitationCopy: {
-    flex: 1,
-  },
-  recitationTitle: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  recitationByline: {
-    color: '#D9EFEB',
-    fontSize: 10,
-    lineHeight: 14,
-    marginTop: 4,
-  },
-  audioError: {
-    color: '#A64D3D',
-    fontSize: 12,
-    lineHeight: 17,
-    marginBottom: 12,
-  },
-  quranVerse: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#E3EAE5',
-    paddingVertical: 14,
-  },
-  activeQuranVerse: {
-    backgroundColor: '#FFF2D6',
-    borderBottomColor: '#F3C969',
-    borderRadius: 14,
-    paddingHorizontal: 12,
-  },
-  verseNumber: {
-    width: 25,
-    height: 25,
-    borderRadius: 13,
-    backgroundColor: '#E5F1EC',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  verseNumberText: {
-    color: '#176B67',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  activeVerseNumber: {
-    backgroundColor: '#F3C969',
-  },
-  quranArabic: {
-    color: '#183B38',
-    fontSize: 24,
-    lineHeight: 44,
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  activeQuranArabic: {
-    fontWeight: '700',
-  },
-  quranTranslation: {
-    color: '#35534F',
-    fontSize: 15,
-    lineHeight: 23,
-    marginTop: 8,
-  },
-  translationAttribution: {
-    color: '#71817D',
-    fontSize: 10,
-    lineHeight: 15,
-    marginTop: 16,
-  },
-  duaCard: {
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    backgroundColor: '#DDF0E9',
-  },
-  duaArabic: {
-    color: '#183B38',
-    fontSize: 26,
-    lineHeight: 48,
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    fontWeight: '600',
-  },
-  duaDivider: {
-    height: 1,
-    backgroundColor: '#B9D8CF',
-    marginVertical: 18,
-  },
-  duaTransliteration: {
-    color: '#35534F',
-    fontSize: 15,
-    lineHeight: 23,
-    fontWeight: '600',
-  },
-  duaSectionLabel: {
-    color: '#D46C53',
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-    marginTop: 24,
-    marginBottom: 8,
-  },
-  duaMeaning: {
-    color: '#183B38',
-    fontSize: 18,
-    lineHeight: 27,
-    fontWeight: '600',
-  },
-  duaReference: {
-    borderTopWidth: 1,
-    borderTopColor: '#E3EAE5',
-    marginTop: 24,
-    paddingTop: 14,
-  },
-  duaReferenceLabel: {
-    color: '#71817D',
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-    marginBottom: 4,
-  },
-  duaSources: {
-    alignItems: 'flex-start',
-  },
-  duaSourceLink: {
-    minHeight: 40,
-    justifyContent: 'center',
-    paddingVertical: 6,
-    paddingRight: 12,
-  },
-  duaReferenceText: {
-    color: '#176B67',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  sourceError: {
-    color: '#A64D3D',
-    fontSize: 11,
-    marginTop: 6,
-  },
-  lessonCard: {
-    minHeight: 224,
-    borderRadius: 22,
-    padding: 20,
-    backgroundColor: '#DDF0E9',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    overflow: 'hidden',
-  },
-  lessonCopy: {
-    flex: 1,
-  },
-  lessonEyebrow: {
-    color: '#176B67',
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1,
-  },
-  bigLetter: {
-    color: '#183B38',
-    fontSize: 92,
-    lineHeight: 100,
-    fontWeight: '800',
-    marginLeft: -4,
-  },
-  word: {
-    color: '#183B38',
-    fontSize: 22,
-    fontWeight: '700',
-  },
-  pictureWell: {
-    width: 122,
-    height: 122,
-    borderRadius: 38,
-    backgroundColor: '#FFF8E8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transform: [{ rotate: '4deg' }],
-  },
-  picture: {
-    fontSize: 70,
-    transform: [{ rotate: '-4deg' }],
-  },
-  actions: {
-    flexDirection: 'row',
-    marginTop: 14,
-  },
-  hearButton: {
-    flex: 1,
-    minHeight: 62,
-    borderRadius: 14,
-    backgroundColor: '#176B67',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 7,
-  },
-  wordButton: {
-    flex: 1,
-    minHeight: 62,
-    borderRadius: 14,
-    backgroundColor: '#FBE2D9',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 7,
-  },
-  hearIcon: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    marginRight: 8,
-  },
-  hearLabel: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  wordIcon: {
-    color: '#A64D3D',
-    fontSize: 18,
-    fontWeight: '800',
-    marginRight: 8,
-  },
-  wordButtonLabel: {
-    color: '#8E463A',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  navigation: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 24,
-    marginBottom: 12,
-  },
-  navButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E5EAE5',
-  },
-  nextButton: {
-    backgroundColor: '#FFC857',
-    borderColor: '#FFC857',
-  },
-  navArrow: {
-    color: '#183B38',
-    fontSize: 30,
-    lineHeight: 34,
-    marginTop: -4,
-  },
-  nextArrow: {
-    color: '#183B38',
-  },
-  navHint: {
-    color: '#71817D',
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 0.7,
-  },
-  pressed: {
-    opacity: 0.78,
-  },
+  safeArea: { flex: 1, backgroundColor: '#F7F9F5' },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 22, paddingTop: 16, paddingBottom: 32 },
+  content: { width: '100%', maxWidth: 620, alignSelf: 'center' },
+  homeScrollContent: { flexGrow: 1, paddingHorizontal: 20, paddingTop: 16, paddingBottom: 36 },
+  homeContent: { width: '100%', maxWidth: 620, alignSelf: 'center' },
+  homeContentWide: { maxWidth: 960 },
+  homeIntro: { marginTop: 28, marginBottom: 18 },
+  homeEyebrow: { color: '#D46C53', fontSize: 11, fontWeight: '800', letterSpacing: 0.8, marginBottom: 6 },
+  homeTitle: { color: '#183B38', fontSize: 29, lineHeight: 34, fontWeight: '800' },
+  homeHero: { minHeight: 190, borderRadius: 22, paddingHorizontal: 20, paddingVertical: 18, backgroundColor: '#176B67', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', overflow: 'hidden' },
+  homeHeroWide: { minHeight: 218, paddingHorizontal: 30, paddingVertical: 24 },
+  heroCopy: { flex: 1, paddingRight: 8 },
+  heroEyebrow: { color: '#BFE9E2', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 8 },
+  heroTitle: { color: '#FFFFFF', fontSize: 23, lineHeight: 28, fontWeight: '800' },
+  heroDescription: { color: '#D9EFEB', fontSize: 13, lineHeight: 19, marginTop: 8 },
+  heroButton: { minHeight: 42, alignSelf: 'flex-start', paddingHorizontal: 14, marginTop: 14, borderRadius: 12, backgroundColor: '#FFC857', flexDirection: 'row', alignItems: 'center' },
+  heroButtonText: { color: '#243D39', fontSize: 13, fontWeight: '800' },
+  heroButtonArrow: { color: '#243D39', fontSize: 24, lineHeight: 26, marginLeft: 10, marginTop: -2 },
+  heroArt: { width: 108, height: 138, alignItems: 'center', justifyContent: 'center', backgroundColor: '#27847D', borderRadius: 18, transform: [{ rotate: '4deg' }] },
+  heroLetters: { color: '#FFFFFF', fontSize: 38, lineHeight: 44, fontWeight: '800' },
+  heroApple: { fontSize: 38, marginTop: 6 },
+  sectionHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 25, marginBottom: 12 },
+  sectionTitle: { color: '#183B38', fontSize: 21, lineHeight: 26, fontWeight: '800' },
+  sectionDescription: { color: '#71817D', fontSize: 12, marginTop: 2 },
+  sectionCount: { color: '#71817D', fontSize: 9, fontWeight: '800', letterSpacing: 0.7 },
+  moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 },
+  moduleCard: { width: '48.8%', minHeight: 118, padding: 12, borderRadius: 16, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E8ECE7', flexDirection: 'row', alignItems: 'flex-start' },
+  availableModuleCard: { borderColor: '#176B67' },
+  moduleIconWell: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  moduleIcon: { fontSize: 23, fontWeight: '800', color: '#183B38' },
+  moduleIconText: { fontSize: 15 },
+  moduleCopy: { flex: 1, minWidth: 0, marginLeft: 10 },
+  moduleTitle: { color: '#183B38', fontSize: 13, lineHeight: 17, fontWeight: '800' },
+  moduleDescription: { color: '#71817D', fontSize: 10, lineHeight: 14, marginTop: 3 },
+  moduleStatus: { color: '#A7ADA8', fontSize: 8, fontWeight: '800', letterSpacing: 0.5, marginTop: 8 },
+  availableStatus: { color: '#176B67' },
+  moduleArrow: { color: '#176B67', fontSize: 21, lineHeight: 24, marginLeft: 3 },
+  languageNote: { borderTopWidth: 1, borderTopColor: '#E3EAE5', marginTop: 26, paddingTop: 14 },
+  languageNoteText: { color: '#183B38', fontSize: 12, fontWeight: '800' },
+  languageNoteSubtext: { color: '#71817D', fontSize: 11, marginTop: 3 },
+  backButton: { minHeight: 38, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', marginBottom: 12, paddingRight: 12 },
+  backArrow: { color: '#176B67', fontSize: 28, lineHeight: 32, marginRight: 5, marginTop: -3 },
+  backLabel: { color: '#176B67', fontSize: 13, fontWeight: '800' },
+  header: { flexDirection: 'row', alignItems: 'center' },
+  brandMark: { width: 42, height: 42, borderRadius: 14, backgroundColor: '#176B67', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
+  brandMarkText: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
+  brandName: { color: '#183B38', fontSize: 18, fontWeight: '800' },
+  brandCaption: { color: '#71817D', fontSize: 8, fontWeight: '700', letterSpacing: 0.7, marginTop: 2 },
+  languagePill: { marginLeft: 'auto', minWidth: 42, height: 34, paddingHorizontal: 10, borderRadius: 17, backgroundColor: '#E5F1EC', alignItems: 'center', justifyContent: 'center' },
+  languageText: { color: '#176B67', fontSize: 12, fontWeight: '800' },
+  titleBlock: { marginTop: 30, marginBottom: 20 },
+  eyebrow: { color: '#D46C53', fontSize: 11, fontWeight: '800', letterSpacing: 1, marginBottom: 8 },
+  title: { color: '#183B38', fontSize: 32, lineHeight: 36, fontWeight: '800' },
+  routinePicker: { flexDirection: 'row', paddingRight: 20, marginBottom: 14 },
+  routineTab: { minHeight: 44, paddingHorizontal: 14, marginRight: 8, borderRadius: 14, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5EAE5', alignItems: 'center', justifyContent: 'center' },
+  selectedRoutineTab: { backgroundColor: '#176B67', borderColor: '#176B67' },
+  routineTabText: { color: '#35534F', fontSize: 12, fontWeight: '700' },
+  selectedRoutineTabText: { color: '#FFFFFF' },
+  surahPicker: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 8, marginBottom: 18 },
+  surahTab: { width: '48.8%', minHeight: 64, padding: 10, borderRadius: 14, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5EAE5' },
+  selectedSurahTab: { backgroundColor: '#176B67', borderColor: '#176B67' },
+  surahTabTitle: { color: '#183B38', fontSize: 13, fontWeight: '800' },
+  surahTabArabic: { color: '#71817D', fontSize: 16, textAlign: 'right', writingDirection: 'rtl', marginTop: 3 },
+  selectedSurahTabTitle: { color: '#FFFFFF' },
+  surahHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2, marginBottom: 8 },
+  surahHeadingTitle: { color: '#183B38', fontSize: 18, fontWeight: '800' },
+  surahHeadingArabic: { color: '#176B67', fontSize: 20, writingDirection: 'rtl' },
+  recitationButton: { minHeight: 72, paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, backgroundColor: '#176B67', flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  recitationIcon: { width: 30, color: '#FFFFFF', fontSize: 21, fontWeight: '800', textAlign: 'center', marginRight: 12 },
+  recitationCopy: { flex: 1 },
+  recitationTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
+  recitationByline: { color: '#D9EFEB', fontSize: 10, lineHeight: 14, marginTop: 4 },
+  audioError: { color: '#A64D3D', fontSize: 12, lineHeight: 17, marginBottom: 12 },
+  quranVerse: { borderBottomWidth: 1, borderBottomColor: '#E3EAE5', paddingVertical: 14 },
+  activeQuranVerse: { backgroundColor: '#FFF2D6', borderBottomColor: '#F3C969', borderRadius: 14, paddingHorizontal: 12 },
+  verseNumber: { width: 25, height: 25, borderRadius: 13, backgroundColor: '#E5F1EC', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  verseNumberText: { color: '#176B67', fontSize: 10, fontWeight: '800' },
+  activeVerseNumber: { backgroundColor: '#F3C969' },
+  quranArabic: { color: '#183B38', fontSize: 24, lineHeight: 44, textAlign: 'right', writingDirection: 'rtl' },
+  activeQuranArabic: { fontWeight: '700' },
+  quranTranslation: { color: '#35534F', fontSize: 15, lineHeight: 23, marginTop: 8 },
+  translationAttribution: { color: '#71817D', fontSize: 10, lineHeight: 15, marginTop: 16 },
+  duaCard: { borderRadius: 20, paddingHorizontal: 20, paddingVertical: 24, backgroundColor: '#DDF0E9' },
+  duaArabic: { color: '#183B38', fontSize: 26, lineHeight: 48, textAlign: 'right', writingDirection: 'rtl', fontWeight: '600' },
+  duaDivider: { height: 1, backgroundColor: '#B9D8CF', marginVertical: 18 },
+  duaTransliteration: { color: '#35534F', fontSize: 15, lineHeight: 23, fontWeight: '600' },
+  duaSectionLabel: { color: '#D46C53', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginTop: 24, marginBottom: 8 },
+  duaMeaning: { color: '#183B38', fontSize: 18, lineHeight: 27, fontWeight: '600' },
+  duaReference: { borderTopWidth: 1, borderTopColor: '#E3EAE5', marginTop: 24, paddingTop: 14 },
+  duaReferenceLabel: { color: '#71817D', fontSize: 9, fontWeight: '800', letterSpacing: 0.8, marginBottom: 4 },
+  duaSources: { alignItems: 'flex-start' },
+  duaSourceLink: { minHeight: 40, justifyContent: 'center', paddingVertical: 6, paddingRight: 12 },
+  duaReferenceText: { color: '#176B67', fontSize: 13, fontWeight: '700' },
+  sourceError: { color: '#A64D3D', fontSize: 11, marginTop: 6 },
+  lessonCard: { minHeight: 224, borderRadius: 22, padding: 20, backgroundColor: '#DDF0E9', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', overflow: 'hidden' },
+  lessonCopy: { flex: 1 },
+  lessonEyebrow: { color: '#176B67', fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  bigLetter: { color: '#183B38', fontSize: 92, lineHeight: 100, fontWeight: '800', marginLeft: -4 },
+  word: { color: '#183B38', fontSize: 22, fontWeight: '700' },
+  pictureWell: { width: 122, height: 122, borderRadius: 38, backgroundColor: '#FFF8E8', alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '4deg' }] },
+  picture: { fontSize: 70, transform: [{ rotate: '-4deg' }] },
+  actions: { flexDirection: 'row', marginTop: 14 },
+  hearButton: { flex: 1, minHeight: 62, borderRadius: 14, backgroundColor: '#176B67', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginRight: 7 },
+  wordButton: { flex: 1, minHeight: 62, borderRadius: 14, backgroundColor: '#FBE2D9', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginLeft: 7 },
+  hearIcon: { color: '#FFFFFF', fontSize: 18, marginRight: 8 },
+  hearLabel: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
+  wordIcon: { color: '#A64D3D', fontSize: 18, fontWeight: '800', marginRight: 8 },
+  wordButtonLabel: { color: '#8E463A', fontSize: 14, fontWeight: '800' },
+  navigation: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 24, marginBottom: 12 },
+  navButton: { width: 56, height: 56, borderRadius: 18, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#E5EAE5' },
+  nextButton: { backgroundColor: '#FFC857', borderColor: '#FFC857' },
+  navArrow: { color: '#183B38', fontSize: 30, lineHeight: 34, marginTop: -4 },
+  nextArrow: { color: '#183B38' },
+  navHint: { color: '#71817D', fontSize: 8, fontWeight: '800', letterSpacing: 0.7 },
+  pressed: { opacity: 0.78 },
 });
