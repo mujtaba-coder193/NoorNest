@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import * as Speech from 'expo-speech';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { ALLAH_NAMES, PROPHET_NAMES } from './deenContent';
 
 type NameGroup = 'allah' | 'prophet';
@@ -15,8 +15,12 @@ export default function BeautifulNamesScreen({ group, onBack }: BeautifulNamesSc
   const names: readonly NameEntry[] = group === 'allah' ? ALLAH_NAMES : PROPHET_NAMES;
   const [selectedId, setSelectedId] = useState(names[0].id);
   const [sourceError, setSourceError] = useState(false);
+  const [query, setQuery] = useState('');
   const selectedName = names.find((name) => name.id === selectedId) ?? names[0];
   const isAllahName = group === 'allah';
+  const filteredNames = names.filter((name) =>
+    `${name.name} ${name.arabic} ${name.meaning}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
+  );
 
   const speak = (text: string, language: string) => {
     void Speech.stop();
@@ -63,28 +67,28 @@ export default function BeautifulNamesScreen({ group, onBack }: BeautifulNamesSc
           <Text style={styles.eyebrow}>LITTLE MOMENTS OF DEEN</Text>
           <Text style={styles.title}>{isAllahName ? 'Beautiful names of Allah' : 'Names of Prophet Muhammad ﷺ'}</Text>
           <Text style={styles.description}>
-            {isAllahName ? 'Listen, learn a meaning, and explore the Qur’an.' : 'Learn the names mentioned by the Prophet ﷺ.'}
+            {isAllahName ? 'Explore a commonly taught collection of 99 names.' : 'Learn the names mentioned by the Prophet ﷺ.'}
           </Text>
         </View>
 
-        <View style={styles.nameGrid}>
-          {names.map((name) => {
-            const isSelected = selectedName.id === name.id;
-            return (
-              <Pressable
-                key={name.id}
-                accessibilityRole="button"
-                accessibilityLabel={`${name.name}, ${name.meaning}`}
-                accessibilityState={{ selected: isSelected }}
-                onPress={() => setSelectedId(name.id)}
-                style={({ pressed }) => [styles.nameCard, isSelected && styles.selectedNameCard, pressed && styles.pressed]}
-              >
-                <Text style={styles.nameCardArabic}>{name.arabic}</Text>
-                <Text style={[styles.nameCardTitle, isSelected && styles.selectedNameCardTitle]}>{name.name}</Text>
+        {isAllahName && (
+          <View style={styles.listNote}>
+            <Text style={styles.listNoteText}>
+              Allah’s names are not limited to 99, and scholars differ on the exact list counted. This is one commonly taught compilation.
+            </Text>
+            <View style={styles.sourceRow}>
+              <Pressable onPress={() => openReference('https://quran.com/7/180')} style={({ pressed }) => pressed && styles.pressed}>
+                <Text style={styles.sourceLink}>Qur’an 7:180 ↗</Text>
               </Pressable>
-            );
-          })}
-        </View>
+              <Pressable onPress={() => openReference('https://sunnah.com/bukhari:2736')} style={({ pressed }) => pressed && styles.pressed}>
+                <Text style={styles.sourceLink}>Sahih al-Bukhari 2736 ↗</Text>
+              </Pressable>
+              <Pressable onPress={() => openReference('https://islamqa.info/en/answers/41003')} style={({ pressed }) => pressed && styles.pressed}>
+                <Text style={styles.sourceLink}>About the list ↗</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
 
         <View style={styles.detailCard}>
           <Text style={styles.detailArabic} accessibilityLabel={`Arabic: ${selectedName.name}`}>
@@ -115,7 +119,7 @@ export default function BeautifulNamesScreen({ group, onBack }: BeautifulNamesSc
             </Pressable>
           </View>
 
-          <Text style={styles.referenceLabel}>REFERENCE</Text>
+          <Text style={styles.referenceLabel}>{isAllahName ? 'LIST SOURCE' : 'REFERENCE'}</Text>
           <Pressable
             accessibilityRole="link"
             onPress={() => openReference(selectedName.url)}
@@ -133,6 +137,39 @@ export default function BeautifulNamesScreen({ group, onBack }: BeautifulNamesSc
             </Pressable>
           )}
           {sourceError && <Text style={styles.sourceError}>Could not open the source. Please try again.</Text>}
+        </View>
+
+        {isAllahName && (
+          <TextInput
+            accessibilityLabel="Search Allah’s names"
+            placeholder="Find a name or meaning"
+            placeholderTextColor="#71817D"
+            value={query}
+            onChangeText={setQuery}
+            autoCapitalize="none"
+            returnKeyType="search"
+            style={styles.searchInput}
+          />
+        )}
+
+        <View style={styles.nameGrid}>
+          {filteredNames.map((name) => {
+            const isSelected = selectedName.id === name.id;
+            return (
+              <Pressable
+                key={name.id}
+                accessibilityRole="button"
+                accessibilityLabel={`${name.name}, ${name.meaning}`}
+                accessibilityState={{ selected: isSelected }}
+                onPress={() => setSelectedId(name.id)}
+                style={({ pressed }) => [styles.nameCard, isSelected && styles.selectedNameCard, pressed && styles.pressed]}
+              >
+                {'number' in name && <Text style={styles.nameNumber}>{name.number}</Text>}
+                <Text style={styles.nameCardArabic}>{name.arabic}</Text>
+                <Text style={[styles.nameCardTitle, isSelected && styles.selectedNameCardTitle]}>{name.name}</Text>
+              </Pressable>
+            );
+          })}
         </View>
 
         {!isAllahName && (
@@ -218,6 +255,31 @@ const styles = StyleSheet.create({
   prophetIntro: {
     backgroundColor: '#E7EDF5',
   },
+  listNote: {
+    padding: 13,
+    borderRadius: 13,
+    backgroundColor: '#FCECC3',
+    marginBottom: 15,
+  },
+  listNoteText: {
+    color: '#5D6256',
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  sourceRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 13,
+    rowGap: 5,
+    marginTop: 7,
+  },
+  sourceLink: {
+    color: '#176B67',
+    fontSize: 10,
+    lineHeight: 15,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
   eyebrow: {
     color: '#D46C53',
     fontSize: 10,
@@ -242,6 +304,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: 9,
     marginBottom: 17,
+  },
+  nameNumber: {
+    color: '#71817D',
+    fontSize: 9,
+    fontWeight: '700',
+    position: 'absolute',
+    top: 6,
+    left: 8,
   },
   nameCard: {
     width: '48.5%',
@@ -272,6 +342,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     marginTop: 2,
+  },
+  searchInput: {
+    minHeight: 46,
+    paddingHorizontal: 13,
+    borderWidth: 1,
+    borderColor: '#DDE5DE',
+    borderRadius: 12,
+    color: '#183B38',
+    backgroundColor: '#FFFFFF',
+    fontSize: 13,
+    marginBottom: 12,
   },
   selectedNameCardTitle: {
     color: '#176B67',
